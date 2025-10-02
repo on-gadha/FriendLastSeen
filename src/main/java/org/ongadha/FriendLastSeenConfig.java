@@ -8,12 +8,13 @@ import net.runelite.client.config.ConfigItem;
 public interface FriendLastSeenConfig extends Config
 {
 	@ConfigItem(
-		keyName = "greeting",
-		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
+		keyName = "lastSeenData",
+		name = "Last Seen Data",
+		description = "Stores serialized friend and puts it in a timestamp map"
 	)
-	default String greeting()
+	default String lastSeenData()
 	{
-		return "abow";
+		return "{}";
 	}
+
 }

@@ -7,6 +7,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -24,9 +25,15 @@ public class FriendLastSeenPlugin extends Plugin
 	@Inject
 	private FriendLastSeenConfig config;
 
+	@Inject
+	private ConfigManager configManager;
+
+	private LastSeenManager lastSeenManager;
+
 	@Override
 	protected void startUp() throws Exception
 	{
+		lastSeenManager = new LastSeenManager(configManager);	//used for methods get or save lastseen
 		log.info("Example started!");
 	}
 
