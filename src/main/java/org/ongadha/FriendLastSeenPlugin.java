@@ -146,5 +146,5 @@ public class FriendLastSeenPlugin extends Plugin
 			}
 		}
 	}
-
+//j
 }

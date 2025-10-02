@@ -43,7 +43,7 @@ public class FriendsListOverlay extends Overlay
                 );
             }
         }
-
+//j
         return panelComponent.render(graphics);
     }
 }
