@@ -13,6 +13,9 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.Overlay;
+
 
 import java.time.LocalDateTime;
 
@@ -33,19 +36,26 @@ public class FriendLastSeenPlugin extends Plugin
 
 	private LastSeenManager lastSeenManager;
 
+	// Overlay reference
+	private FriendsListOverlay friendsListOverlay;
 
+	@Inject
+	private OverlayManager overlayManager;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		lastSeenManager = new LastSeenManager(configManager);	//used for methods get or save lastseen
-		log.info("FriendLastSeen started!");
+		lastSeenManager = new LastSeenManager(configManager);
+		friendsListOverlay = new FriendsListOverlay(lastSeenManager, this);
 
+		overlayManager.add(friendsListOverlay); // <-- THIS is crucial
+		log.info("FriendLastSeen started!");
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
+		overlayManager.remove(friendsListOverlay); // clean up
 		log.info("FriendLastSeen stopped!");
 	}
 
@@ -97,7 +107,7 @@ public class FriendLastSeenPlugin extends Plugin
 		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", friendName + " was last seen " + formatted, null);
 	}*/
 
-	private String formatElapsedTime(long elapsedMillis)
+	public String formatElapsedTime(long elapsedMillis)
 	{
 		long seconds = elapsedMillis / 1000;
 		long minutes = seconds / 60;
@@ -119,7 +129,7 @@ public class FriendLastSeenPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void LogoutForFriend(ChatMessage message) {
+	public void onChatMessage(ChatMessage message) {
 		if (message.getType() == ChatMessageType.LOGINLOGOUTNOTIFICATION) {
 			String text = message.getMessageNode().getValue();
 
