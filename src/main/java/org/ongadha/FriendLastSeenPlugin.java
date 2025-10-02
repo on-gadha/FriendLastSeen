@@ -34,7 +34,8 @@ public class FriendLastSeenPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		lastSeenManager = new LastSeenManager(configManager);	//used for methods get or save lastseen
-		log.info("Example started!");
+		log.info("FriendLastSeen started!");
+		client.getChatMessageManager().addChatCommand("lastseen", this::onLastSeenCommand);
 	}
 
 	@Override
@@ -56,5 +57,46 @@ public class FriendLastSeenPlugin extends Plugin
 	FriendLastSeenConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(FriendLastSeenConfig.class);
+	}
+
+	private void onLastSeenCommand(String command)
+	{
+		String[] parts = command.split(" ");
+		if (parts.length < 2)
+		{
+			client.addChatMessage(chatMessageType.GAMEMESSAGE, "", "Usage: !lastseen <friendName>", null);
+			return;
+		}
+		String friendName = parts[1];
+		Long lastSeen = lastSeenManager.getLastSeen(friendName);
+		if (lastSeen == null)
+		{
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", friendName + " has no last seen data.", null);
+			return;
+		}
+
+		String formatted = formatElapsedTime(System.currentTimeMillis() - lastSeen);
+		client.addChatMessage(chatMessageType.GAMEMESSAGE, "", friendName + " was last seen " + formatted, null)
+	}
+
+	private String formatElapsedTime(long elapsedMillis)
+	{
+		long seconds = elapsedMillis / 1000;
+		long minutes = seconds / 60;
+		long hours = minutes / 60;
+		long days = hours / 24;
+
+		if (days > 0)
+		{
+			return days + " days " + (hours % 24) + " hours " + (minutes % 60) + " minutes ago"
+		}
+		else if (hours > 0)
+		{
+			return hours + " hours " + (minutes % 60) + " minutes ago";
+		}
+		else
+		{
+			return minutes + " minutes ago";
+		}
 	}
 }
