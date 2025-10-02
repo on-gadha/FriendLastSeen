@@ -44,7 +44,7 @@ public class FriendLastSeenPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
-		log.info("Example stopped!");
+		log.info("FriendLastSeen stopped!");
 	}
 
 	@Subscribe
@@ -62,7 +62,7 @@ public class FriendLastSeenPlugin extends Plugin
 		return configManager.getConfig(FriendLastSeenConfig.class);
 	}
 
-	@Subscribe
+	/*@Subscribe
 	public void onChatMessage(ChatMessage event)
 	{
 		String message = event.getMessage().trim();
@@ -72,10 +72,10 @@ public class FriendLastSeenPlugin extends Plugin
 		{
 			onLastSeenCommand(message);
 		}
-	}
+	}*/
 
 
-	private void onLastSeenCommand(String command)
+	/*private void onLastSeenCommand(String command)
 	{
 		String[] parts = command.split(" ");
 		if (parts.length < 2)
@@ -93,7 +93,7 @@ public class FriendLastSeenPlugin extends Plugin
 
 		String formatted = formatElapsedTime(System.currentTimeMillis() - lastSeen);
 		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", friendName + " was last seen " + formatted, null);
-	}
+	}*/
 
 	private String formatElapsedTime(long elapsedMillis)
 	{
