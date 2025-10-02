@@ -8,6 +8,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -30,12 +31,14 @@ public class FriendLastSeenPlugin extends Plugin
 
 	private LastSeenManager lastSeenManager;
 
+
+
 	@Override
 	protected void startUp() throws Exception
 	{
 		lastSeenManager = new LastSeenManager(configManager);	//used for methods get or save lastseen
 		log.info("FriendLastSeen started!");
-		client.getChatMessageManager().addChatCommand("lastseen", this::onLastSeenCommand);
+
 	}
 
 	@Override
@@ -59,12 +62,25 @@ public class FriendLastSeenPlugin extends Plugin
 		return configManager.getConfig(FriendLastSeenConfig.class);
 	}
 
+	@Subscribe
+	public void onChatMessage(ChatMessage event)
+	{
+		String message = event.getMessage().trim();
+
+		// Check if it starts with your command
+		if (message.startsWith("!lastseen "))
+		{
+			onLastSeenCommand(message);
+		}
+	}
+
+
 	private void onLastSeenCommand(String command)
 	{
 		String[] parts = command.split(" ");
 		if (parts.length < 2)
 		{
-			client.addChatMessage(chatMessageType.GAMEMESSAGE, "", "Usage: !lastseen <friendName>", null);
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Usage: !lastseen <friendName>", null);
 			return;
 		}
 		String friendName = parts[1];
@@ -76,7 +92,7 @@ public class FriendLastSeenPlugin extends Plugin
 		}
 
 		String formatted = formatElapsedTime(System.currentTimeMillis() - lastSeen);
-		client.addChatMessage(chatMessageType.GAMEMESSAGE, "", friendName + " was last seen " + formatted, null)
+		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", friendName + " was last seen " + formatted, null);
 	}
 
 	private String formatElapsedTime(long elapsedMillis)
@@ -88,7 +104,7 @@ public class FriendLastSeenPlugin extends Plugin
 
 		if (days > 0)
 		{
-			return days + " days " + (hours % 24) + " hours " + (minutes % 60) + " minutes ago"
+			return days + " days " + (hours % 24) + " hours " + (minutes % 60) + " minutes ago";
 		}
 		else if (hours > 0)
 		{
@@ -99,5 +115,4 @@ public class FriendLastSeenPlugin extends Plugin
 			return minutes + " minutes ago";
 		}
 	}
-	//hejjj
 }
