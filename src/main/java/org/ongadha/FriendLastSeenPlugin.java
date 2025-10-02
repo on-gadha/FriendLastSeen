@@ -99,4 +99,5 @@ public class FriendLastSeenPlugin extends Plugin
 			return minutes + " minutes ago";
 		}
 	}
+	//hej
 }
