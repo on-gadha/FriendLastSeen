@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @PluginDescriptor(
-	name = "FriendLastSeen"
+		name = "FriendLastSeen"
 )
 public class FriendLastSeenPlugin extends Plugin
 {
@@ -127,6 +127,9 @@ public class FriendLastSeenPlugin extends Plugin
 				String name = text.substring(0, text.indexOf(" "));
 
 				LocalDateTime now = LocalDateTime.now();
+
+				long timestamp = System.currentTimeMillis();
+				lastSeenManager.saveLastSeen(name, timestamp);
 
 				log.info("{} logged out at {}", name, now);
 
