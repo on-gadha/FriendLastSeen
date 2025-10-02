@@ -14,6 +14,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @PluginDescriptor(
 	name = "FriendLastSeen"
@@ -115,4 +117,21 @@ public class FriendLastSeenPlugin extends Plugin
 			return minutes + " minutes ago";
 		}
 	}
+
+	@Subscribe
+	public void LogoutForFriend(ChatMessage message) {
+		if (message.getType() == ChatMessageType.LOGINLOGOUTNOTIFICATION) {
+			String text = message.getMessageNode().getValue();
+
+			if (text.contains("has logged out")) {
+				String name = text.substring(0, text.indexOf(" "));
+
+				LocalDateTime now = LocalDateTime.now();
+
+				log.info("{} logged out at {}", name, now);
+
+			}
+		}
+	}
+
 }
