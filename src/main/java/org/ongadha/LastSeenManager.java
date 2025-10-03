@@ -39,7 +39,7 @@ public class LastSeenManager
         configManager.setConfiguration("friendlastseen", "lastSeenData", json);
     }
 
-    public void saveLastSeen(String friendName, long timestamp)
+    public void saveLastSeen(String friendName, Long timestamp)
     {
         lastSeenMap.put(friendName, timestamp);
         save();

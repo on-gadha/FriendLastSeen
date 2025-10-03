@@ -101,7 +101,7 @@ public class FriendLastSeenPlugin extends Plugin
 			}else if (text.contains("has logged in")){
 				String name = text.substring(0, text.indexOf(" "));
 				long timestamp = System.currentTimeMillis();
-				lastSeenManager.saveLastSeen(name, timestamp);
+				lastSeenManager.saveLastSeen(name, null);
 			}
 		}
 	}
