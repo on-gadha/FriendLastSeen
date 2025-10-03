@@ -93,12 +93,15 @@ public class FriendLastSeenPlugin extends Plugin
 		if (message.getType() == ChatMessageType.LOGINLOGOUTNOTIFICATION)
 		{
 			String text = message.getMessageNode().getValue();
-			if (text.contains("has logged out"))
-			{
+			if (text.contains("has logged out")) {
 				String name = text.substring(0, text.indexOf(" "));
 				long timestamp = System.currentTimeMillis();
 				lastSeenManager.saveLastSeen(name, timestamp);
-				log.info("{} logged out at {}", name, LocalDateTime.now());
+
+			}else if (text.contains("has logged in")){
+				String name = text.substring(0, text.indexOf(" "));
+				long timestamp = System.currentTimeMillis();
+				lastSeenManager.saveLastSeen(name, timestamp);
 			}
 		}
 	}
