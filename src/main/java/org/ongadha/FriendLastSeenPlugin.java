@@ -1,22 +1,21 @@
 package org.ongadha;
 
 import com.google.inject.Provides;
-import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.ui.overlay.Overlay;
 
-
+import javax.inject.Inject;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -34,38 +33,31 @@ public class FriendLastSeenPlugin extends Plugin
 	@Inject
 	private ConfigManager configManager;
 
-	private LastSeenManager lastSeenManager;
-
-	// Overlay reference
-	private FriendsListOverlay friendsListOverlay;
-
 	@Inject
 	private OverlayManager overlayManager;
+
+	@Inject
+	private ClientThread clientThread;
+
+	private LastSeenManager lastSeenManager;
+	private FriendsListOverlay friendsListOverlay;
 
 	@Override
 	protected void startUp() throws Exception
 	{
 		lastSeenManager = new LastSeenManager(configManager);
-		friendsListOverlay = new FriendsListOverlay(lastSeenManager, this);
+		friendsListOverlay = new FriendsListOverlay(lastSeenManager, this, client);
 
-		overlayManager.add(friendsListOverlay); // <-- THIS is crucial
+		overlayManager.add(friendsListOverlay);
+
 		log.info("FriendLastSeen started!");
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		overlayManager.remove(friendsListOverlay); // clean up
+		overlayManager.remove(friendsListOverlay);
 		log.info("FriendLastSeen stopped!");
-	}
-
-	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged)
-	{
-		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
-		{
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.greeting(), null);
-		}
 	}
 
 	@Provides
@@ -73,39 +65,6 @@ public class FriendLastSeenPlugin extends Plugin
 	{
 		return configManager.getConfig(FriendLastSeenConfig.class);
 	}
-
-	/*@Subscribe
-	public void onChatMessage(ChatMessage event)
-	{
-		String message = event.getMessage().trim();
-
-		// Check if it starts with your command
-		if (message.startsWith("!lastseen "))
-		{
-			onLastSeenCommand(message);
-		}
-	}*/
-
-
-	/*private void onLastSeenCommand(String command)
-	{
-		String[] parts = command.split(" ");
-		if (parts.length < 2)
-		{
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Usage: !lastseen <friendName>", null);
-			return;
-		}
-		String friendName = parts[1];
-		Long lastSeen = lastSeenManager.getLastSeen(friendName);
-		if (lastSeen == null)
-		{
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", friendName + " has no last seen data.", null);
-			return;
-		}
-
-		String formatted = formatElapsedTime(System.currentTimeMillis() - lastSeen);
-		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", friendName + " was last seen " + formatted, null);
-	}*/
 
 	public String formatElapsedTime(long elapsedMillis)
 	{
@@ -129,22 +88,25 @@ public class FriendLastSeenPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onChatMessage(ChatMessage message) {
-		if (message.getType() == ChatMessageType.LOGINLOGOUTNOTIFICATION) {
+	public void onChatMessage(ChatMessage message)
+	{
+		if (message.getType() == ChatMessageType.LOGINLOGOUTNOTIFICATION)
+		{
 			String text = message.getMessageNode().getValue();
-
-			if (text.contains("has logged out")) {
+			if (text.contains("has logged out"))
+			{
 				String name = text.substring(0, text.indexOf(" "));
-
-				LocalDateTime now = LocalDateTime.now();
-
 				long timestamp = System.currentTimeMillis();
 				lastSeenManager.saveLastSeen(name, timestamp);
-
-				log.info("{} logged out at {}", name, now);
-
+				log.info("{} logged out at {}", name, LocalDateTime.now());
 			}
 		}
 	}
-//j
+
+	@Subscribe
+	public void onMenuEntryAdded(MenuEntryAdded event)
+	{
+		// Update hovered friend in overlay
+		friendsListOverlay.updateHoveredFriend(event.getTarget().replaceAll("<.*?>", "").trim());
+	}
 }

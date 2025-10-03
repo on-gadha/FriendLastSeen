@@ -1,5 +1,6 @@
 package org.ongadha;
 
+import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -7,20 +8,29 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 
 import java.awt.*;
-import java.util.Map;
 
 public class FriendsListOverlay extends Overlay
 {
     private final LastSeenManager lastSeenManager;
     private final FriendLastSeenPlugin plugin;
+    private final Client client;
     private final PanelComponent panelComponent = new PanelComponent();
 
-    public FriendsListOverlay(LastSeenManager manager, FriendLastSeenPlugin plugin)
+    private String hoveredFriend = null;
+
+    public FriendsListOverlay(LastSeenManager manager, FriendLastSeenPlugin plugin, Client client)
     {
         this.lastSeenManager = manager;
         this.plugin = plugin;
+        this.client = client;
+
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
+    }
+
+    public void updateHoveredFriend(String friendName)
+    {
+        this.hoveredFriend = friendName;
     }
 
     @Override
@@ -28,22 +38,25 @@ public class FriendsListOverlay extends Overlay
     {
         panelComponent.getChildren().clear();
 
-        // Loop through all friends in lastSeenManager
-        for (Map.Entry<String, Long> entry : lastSeenManager.getAllLastSeen().entrySet())
-        {
-            String friendName = entry.getKey();
-            Long timestamp = entry.getValue();
-            if (timestamp != null)
-            {
-                panelComponent.getChildren().add(
-                        LineComponent.builder()
-                                .left(friendName)
-                                .right(plugin.formatElapsedTime(System.currentTimeMillis() - timestamp))
-                                .build()
-                );
-            }
-        }
-//j
+        if (hoveredFriend == null)
+            return null;
+
+        Long lastSeen = lastSeenManager.getLastSeen(hoveredFriend);
+        if (lastSeen == null)
+            return null;
+
+        panelComponent.getChildren().add(
+                LineComponent.builder()
+                        .left(hoveredFriend)
+                        .right(plugin.formatElapsedTime(System.currentTimeMillis() - lastSeen))
+                        .build()
+        );
+
+        // Get mouse position and convert to java.awt.Point
+        net.runelite.api.Point mouse = client.getMouseCanvasPosition();
+        if (mouse != null)
+            panelComponent.setPreferredLocation(new Point(mouse.getX() + 15, mouse.getY()));
+
         return panelComponent.render(graphics);
     }
 }
