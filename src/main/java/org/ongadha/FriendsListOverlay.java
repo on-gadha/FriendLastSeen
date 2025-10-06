@@ -9,6 +9,15 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 
 import java.awt.*;
 
+/*
+@Tom
+(S), men nästan. hoveredFriend bör flyttas till en egen klass
+(O), bra
+(L), bra
+(I), bra
+(D), problem = lastseenmanager och firendlastseenpluin är konkreta klasser
+ */
+
 public class FriendsListOverlay extends Overlay
 {
     private final LastSeenManager lastSeenManager;

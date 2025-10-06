@@ -4,6 +4,14 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
+/*
+(S), två purpose, försök ta bort greeting
+(O), ej tillämpad
+(L), bra
+(I), kopplad till (S)
+(D), bra
+ */
+
 @ConfigGroup("FriendLastSeen")
 public interface FriendLastSeenConfig extends Config
 {

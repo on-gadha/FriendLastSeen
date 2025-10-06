@@ -4,9 +4,7 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -16,7 +14,14 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
+
+/*
+(S), olika purpose, bryt ut till mindre classer: formatting time, chat message
+(O), onchatmessage skapar problem, kan ignoreras
+(L), bra
+(I), bra
+(D), bra eventuellt lägga till interface
+ */
 
 @Slf4j
 @PluginDescriptor(
@@ -27,6 +32,7 @@ public class FriendLastSeenPlugin extends Plugin
 	@Inject
 	private Client client;
 
+	//Unused
 	@Inject
 	private FriendLastSeenConfig config;
 
@@ -36,6 +42,7 @@ public class FriendLastSeenPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
+	//Unused
 	@Inject
 	private ClientThread clientThread;
 
@@ -60,6 +67,7 @@ public class FriendLastSeenPlugin extends Plugin
 		log.info("FriendLastSeen stopped!");
 	}
 
+	//Unused
 	@Provides
 	FriendLastSeenConfig provideConfig(ConfigManager configManager)
 	{
@@ -106,6 +114,7 @@ public class FriendLastSeenPlugin extends Plugin
 		}
 	}
 
+	//Unused
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{

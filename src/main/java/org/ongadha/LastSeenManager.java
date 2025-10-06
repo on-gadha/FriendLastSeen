@@ -7,6 +7,15 @@ import java.util.HashMap;
 import java.util.Map;
 import net.runelite.client.config.ConfigManager;
 
+/*
+@Samuel
+(S), eventuellt två purpose, åtgärda
+(O), strong coupling med configmanager
+(L), bra
+(I), bra
+(D), strong coupling med configmanager
+ */
+
 public class LastSeenManager
 {
     private final ConfigManager configManager;
@@ -50,10 +59,9 @@ public class LastSeenManager
         return lastSeenMap.get(friendName);
     }
 
+    // Unused
     public Map<String, Long> getAllLastSeen()
     {
         return new HashMap<>(lastSeenMap);
     }
-
-//j
 }
