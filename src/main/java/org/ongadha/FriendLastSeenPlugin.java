@@ -15,6 +15,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.eventbus.EventBus;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /*
 (S), olika purpose, bryt ut till mindre classer: formatting time, chat message (FIXAT)
@@ -57,14 +58,14 @@ public class FriendLastSeenPlugin extends Plugin
 	private EventBus eventBus;
 
 	@Inject
-	private LastSeenManager lastSeenManager;
+	private LastSeenProvider lastSeenProvider;
 
 	private FriendsListOverlay friendsListOverlay;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		friendsListOverlay = new FriendsListOverlay(lastSeenManager, this, client, formatTime);
+		friendsListOverlay = new FriendsListOverlay(lastSeenProvider, this, client, formatTime);
 
 		overlayManager.add(friendsListOverlay);
 		eventBus.register(chatMessageListener);
@@ -80,14 +81,24 @@ public class FriendLastSeenPlugin extends Plugin
 		log.info("FriendLastSeen stopped!");
 	}
 
-	//Unused
+	@Provides
+	@Singleton
+	LastSeenStorage provideLastSeenStorage(ConfigManager configManager){
+		return new ConfigManagerStorage(configManager);
+	}
+
+	@Provides
+	@Singleton
+	LastSeenProvider provideLastSeenProvider(LastSeenStorage storage){
+		return new LastSeenManager(storage);
+	}
+
 	@Provides
 	FriendLastSeenConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(FriendLastSeenConfig.class);
 	}
 
-	//Unused
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{

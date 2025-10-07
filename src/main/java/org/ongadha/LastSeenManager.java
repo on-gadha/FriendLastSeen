@@ -12,51 +12,30 @@ import javax.inject.Singleton;
 
 /*
 @Samuel
-(S), eventuellt två purpose, åtgärda
-(O), strong coupling med configmanager
+(S), eventuellt två purpose, åtgärda (fixat)
+(O), strong coupling med configmanager (fixat)
 (L), bra
 (I), bra
-(D), strong coupling med configmanager
+(D), strong coupling med configmanager (fixat)
  */
 
 @Singleton
-public class LastSeenManager
+public class LastSeenManager implements LastSeenProvider
 {
-    private final ConfigManager configManager;
-    private final Gson gson = new Gson();
-    private Map<String, Long> lastSeenMap;
+    private final LastSeenStorage storage;
+    private final Map<String, Long> lastSeenMap;
 
     @Inject
-    public LastSeenManager(ConfigManager configManager)
+    public LastSeenManager(LastSeenStorage storage)
     {
-        this.configManager = configManager;
-        load();
-    }
-
-    private void load()
-    {
-        String json = configManager.getConfiguration("friendlastseen", "lastSeenData");
-        if (json == null || json.isEmpty())
-        {
-            lastSeenMap = new HashMap<>();
-        }
-        else
-        {
-            Type type = new TypeToken<Map<String, Long>>() {}.getType();
-            lastSeenMap = gson.fromJson(json, type);
-        }
-    }
-
-    private void save()
-    {
-        String json = gson.toJson(lastSeenMap);
-        configManager.setConfiguration("friendlastseen", "lastSeenData", json);
+        this.storage = storage;
+        this.lastSeenMap = storage.load();
     }
 
     public void saveLastSeen(String friendName, Long timestamp)
     {
         lastSeenMap.put(friendName, timestamp);
-        save();
+        storage.save(lastSeenMap);
     }
 
     public Long getLastSeen(String friendName)
@@ -64,9 +43,4 @@ public class LastSeenManager
         return lastSeenMap.get(friendName);
     }
 
-    // Unused
-    public Map<String, Long> getAllLastSeen()
-    {
-        return new HashMap<>(lastSeenMap);
-    }
 }

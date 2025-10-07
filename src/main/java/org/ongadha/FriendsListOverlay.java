@@ -15,12 +15,12 @@ import java.awt.*;
 (O), bra
 (L), bra
 (I), bra
-(D), problem = lastseenmanager och firendlastseenpluin är konkreta klasser
+(D), problem = lastseenmanager och firendlastseenpluin är konkreta klasser (kanske fixat)
  */
 
 public class FriendsListOverlay extends Overlay
 {
-    private final LastSeenManager lastSeenManager;
+    private final LastSeenProvider lastSeenProvider;
     private final FriendLastSeenPlugin plugin;
     private final Client client;
     private final FormatForTime formatTime;
@@ -28,9 +28,9 @@ public class FriendsListOverlay extends Overlay
 
     private String hoveredFriend = null;
 
-    public FriendsListOverlay(LastSeenManager manager, FriendLastSeenPlugin plugin, Client client, FormatForTime formatTime)
+    public FriendsListOverlay(LastSeenProvider provider, FriendLastSeenPlugin plugin, Client client, FormatForTime formatTime)
     {
-        this.lastSeenManager = manager;
+        this.lastSeenProvider = provider;
         this.plugin = plugin;
         this.client = client;
         this.formatTime = formatTime;
@@ -52,7 +52,7 @@ public class FriendsListOverlay extends Overlay
         if (hoveredFriend == null)
             return null;
 
-        Long lastSeen = lastSeenManager.getLastSeen(hoveredFriend);
+        Long lastSeen = lastSeenProvider.getLastSeen(hoveredFriend);
         if (lastSeen == null)
             return null;
 

@@ -9,11 +9,11 @@ import javax.inject.Singleton;
 @Singleton
 public class ChatMessageListener {
 
-    private final LastSeenManager lastSeenManager;
+    private final LastSeenProvider lastSeenProvider;
 
     @Inject
-    public ChatMessageListener(LastSeenManager lastSeenManager){
-        this.lastSeenManager = lastSeenManager;
+    public ChatMessageListener(LastSeenProvider lastSeenProvider){
+        this.lastSeenProvider = lastSeenProvider;
     }
 
     @Subscribe
@@ -25,12 +25,12 @@ public class ChatMessageListener {
             if (text.contains("has logged out")) {
                 String name = text.substring(0, text.indexOf(" "));
                 long timestamp = System.currentTimeMillis();
-                lastSeenManager.saveLastSeen(name, timestamp);
+                lastSeenProvider.saveLastSeen(name, timestamp);
 
             }else if (text.contains("has logged in")){
                 String name = text.substring(0, text.indexOf(" "));
                 long timestamp = System.currentTimeMillis();
-                lastSeenManager.saveLastSeen(name, null);
+                lastSeenProvider.saveLastSeen(name, null);
             }
         }
     }
