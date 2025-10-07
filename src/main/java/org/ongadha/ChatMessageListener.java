@@ -2,6 +2,7 @@ package org.ongadha;
 
 import net.runelite.api.ChatMessageType;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.api.events.ChatMessage;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,14 +11,16 @@ import javax.inject.Singleton;
 public class ChatMessageListener {
 
     private final LastSeenProvider lastSeenProvider;
+    private final ChatMessage message;
 
     @Inject
-    public ChatMessageListener(LastSeenProvider lastSeenProvider){
+    public ChatMessageListener(LastSeenProvider lastSeenProvider, ChatMessage message){
         this.lastSeenProvider = lastSeenProvider;
+        this.message = message;
     }
 
     @Subscribe
-    public void onChatMessage(net.runelite.api.events.ChatMessage message)
+    public void onChatMessage(ChatMessage message)
     {
         if (message.getType() == ChatMessageType.LOGINLOGOUTNOTIFICATION)
         {
