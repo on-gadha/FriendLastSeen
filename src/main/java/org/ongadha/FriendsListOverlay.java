@@ -23,15 +23,17 @@ public class FriendsListOverlay extends Overlay
     private final LastSeenManager lastSeenManager;
     private final FriendLastSeenPlugin plugin;
     private final Client client;
+    private final FormatForTime formatTime;
     private final PanelComponent panelComponent = new PanelComponent();
 
     private String hoveredFriend = null;
 
-    public FriendsListOverlay(LastSeenManager manager, FriendLastSeenPlugin plugin, Client client)
+    public FriendsListOverlay(LastSeenManager manager, FriendLastSeenPlugin plugin, Client client, FormatForTime formatTime)
     {
         this.lastSeenManager = manager;
         this.plugin = plugin;
         this.client = client;
+        this.formatTime = formatTime;
 
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
@@ -57,7 +59,7 @@ public class FriendsListOverlay extends Overlay
         panelComponent.getChildren().add(
                 LineComponent.builder()
                         .left(hoveredFriend)
-                        .right(plugin.formatElapsedTime(System.currentTimeMillis() - lastSeen))
+                        .right(formatTime.formatElapsedTime(System.currentTimeMillis() - lastSeen))
                         .build()
         );
 

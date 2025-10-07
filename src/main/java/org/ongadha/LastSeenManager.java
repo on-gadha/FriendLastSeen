@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import net.runelite.client.config.ConfigManager;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /*
 @Samuel
 (S), eventuellt två purpose, åtgärda
@@ -16,12 +19,14 @@ import net.runelite.client.config.ConfigManager;
 (D), strong coupling med configmanager
  */
 
+@Singleton
 public class LastSeenManager
 {
     private final ConfigManager configManager;
     private final Gson gson = new Gson();
     private Map<String, Long> lastSeenMap;
 
+    @Inject
     public LastSeenManager(ConfigManager configManager)
     {
         this.configManager = configManager;

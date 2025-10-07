@@ -12,15 +12,16 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.eventbus.EventBus;
 
 import javax.inject.Inject;
 
 /*
-(S), olika purpose, bryt ut till mindre classer: formatting time, chat message
+(S), olika purpose, bryt ut till mindre classer: formatting time, chat message (FIXAT)
 (O), onchatmessage skapar problem, kan ignoreras
 (L), bra
 (I), bra
-(D), bra eventuellt lägga till interface
+(D), bra eventuellt lÃ¤gga till interface
  */
 
 @Slf4j
@@ -46,16 +47,27 @@ public class FriendLastSeenPlugin extends Plugin
 	@Inject
 	private ClientThread clientThread;
 
+	@Inject
+	private FormatForTime formatTime;
+
+	@Inject
+	private ChatMessageListener chatMessageListener;
+
+	@Inject
+	private EventBus eventBus;
+
+	@Inject
 	private LastSeenManager lastSeenManager;
+
 	private FriendsListOverlay friendsListOverlay;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		lastSeenManager = new LastSeenManager(configManager);
-		friendsListOverlay = new FriendsListOverlay(lastSeenManager, this, client);
+		friendsListOverlay = new FriendsListOverlay(lastSeenManager, this, client, formatTime);
 
 		overlayManager.add(friendsListOverlay);
+		eventBus.register(chatMessageListener);
 
 		log.info("FriendLastSeen started!");
 	}
@@ -64,6 +76,7 @@ public class FriendLastSeenPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		overlayManager.remove(friendsListOverlay);
+		eventBus.unregister(chatMessageListener);
 		log.info("FriendLastSeen stopped!");
 	}
 
@@ -72,46 +85,6 @@ public class FriendLastSeenPlugin extends Plugin
 	FriendLastSeenConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(FriendLastSeenConfig.class);
-	}
-
-	public String formatElapsedTime(long elapsedMillis)
-	{
-		long seconds = elapsedMillis / 1000;
-		long minutes = seconds / 60;
-		long hours = minutes / 60;
-		long days = hours / 24;
-
-		if (days > 0)
-		{
-			return days + " days " + (hours % 24) + " hours " + (minutes % 60) + " minutes ago";
-		}
-		else if (hours > 0)
-		{
-			return hours + " hours " + (minutes % 60) + " minutes ago";
-		}
-		else
-		{
-			return minutes + " minutes ago";
-		}
-	}
-
-	@Subscribe
-	public void onChatMessage(ChatMessage message)
-	{
-		if (message.getType() == ChatMessageType.LOGINLOGOUTNOTIFICATION)
-		{
-			String text = message.getMessageNode().getValue();
-			if (text.contains("has logged out")) {
-				String name = text.substring(0, text.indexOf(" "));
-				long timestamp = System.currentTimeMillis();
-				lastSeenManager.saveLastSeen(name, timestamp);
-
-			}else if (text.contains("has logged in")){
-				String name = text.substring(0, text.indexOf(" "));
-				long timestamp = System.currentTimeMillis();
-				lastSeenManager.saveLastSeen(name, null);
-			}
-		}
 	}
 
 	//Unused
